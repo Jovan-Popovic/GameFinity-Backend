@@ -1,23 +1,18 @@
 const mongoose = require("mongoose");
 
-const userSchema = new mongoose.Schema(
+const creatorSchema = new mongoose.Schema(
   {
-    username: {
+    gameId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "creator",
+      required: true,
+    },
+    name: {
       type: String,
-      minlength: 5,
-      maxlength: 20,
+      minlength: 2,
+      maxlength: 30,
       required: true,
       unique: true,
-    },
-    firstName: {
-      type: String,
-      maxlength: 50,
-      required: true,
-    },
-    lastName: {
-      type: String,
-      maxlength: 50,
-      required: true,
     },
     email: {
       type: String,
@@ -34,10 +29,7 @@ const userSchema = new mongoose.Schema(
       required: true,
       validate: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).*$/,
     },
-    profilePic: {
-      type: String,
-      default: "https://www.computerhope.com/jargon/g/guest-user.jpg",
-    },
+    logo: String,
     location: {
       type: String,
       minlength: 5,
@@ -69,14 +61,8 @@ const userSchema = new mongoose.Schema(
         validator: Number.isInteger,
       },
     },
-    admin: {
-      type: Boolean,
-      default: false,
-    },
   },
-  { collection: "users", timestamps: true }
+  { collection: "creators", timestamps: true }
 );
 
-userSchema.index({ username: 1 }, { unique: true });
-
-module.exports = mongoose.model("user", userSchema);
+module.exports = mongoose.model("creator", creatorSchema);
