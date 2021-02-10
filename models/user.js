@@ -69,9 +69,11 @@ const userSchema = new mongoose.Schema(
         validator: Number.isInteger,
       },
     },
-    admin: {
-      type: Boolean,
-      default: false,
+    role: {
+      type: String,
+      minlength: 4,
+      maxlength: 7,
+      default: "user",
     },
   },
   { collection: "users", timestamps: true }

@@ -5,12 +5,12 @@ const gameSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
-      default: "Owned by creator",
+      default: undefined,
     },
     creatorId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "creator",
-      required: true,
+      ref: "user",
+      default: undefined,
     },
     requirementsId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -78,7 +78,7 @@ const gameSchema = new mongoose.Schema(
       },
     },
   },
-  { collection: "games", timestamps: true }
+  { collection: "games", retainNullValues: true, timestamps: true }
 );
 
 userSchema.index({ name: 1 }, { unique: true });

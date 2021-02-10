@@ -2,14 +2,10 @@ const mongoose = require("mongoose");
 
 const commentSchema = new mongoose.Schema(
   {
-    gameId: {
+    postedOn: String,
+    postedId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "game",
-      required: true,
-    },
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      refPath: "postedOn",
       required: true,
     },
     body: {
@@ -37,5 +33,4 @@ const commentSchema = new mongoose.Schema(
   { collection: "comments", timestamps: true }
 );
 
-//For RAM and Storage the measurement unit is GB
 module.exports = mongoose.model("comment", commentSchema);

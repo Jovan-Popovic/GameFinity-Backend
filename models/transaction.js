@@ -14,7 +14,7 @@ const transactionSchema = new mongoose.Schema(
     },
     sellerId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "user" || "creator",
+      ref: "user",
       required: true,
     },
     confirmed: {
