@@ -1,6 +1,6 @@
 const express = require("express");
 const { json } = require("body-parser");
-require("dotenv").config;
+require("dotenv").config();
 
 const User = require("./controllers/user");
 const Game = require("./controllers/game");
@@ -30,9 +30,9 @@ app.get("/", (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-connect(process.env.DB_URL)
+//Connecting to the server
+connect(process.env.DB_URI)
   .then(() =>
-    //Connecting to the server
     app.listen(PORT, () =>
       console.log(`Server is running on the port ${PORT}.`)
     )

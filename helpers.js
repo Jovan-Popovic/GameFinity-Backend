@@ -1,12 +1,8 @@
 const mongoose = require("mongoose");
-// const jwt = require("jsonwebtoken");
-// const nodemailer = require("nodemailer");
-
-// require("dotenv").config();
 
 //Connect with the database
-const connect = (url) =>
-  mongoose.connect(url, {
+const connect = (uri) =>
+  mongoose.connect(uri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
