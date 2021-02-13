@@ -1,9 +1,7 @@
 const { SHA256 } = require("crypto-js");
 
 const User = require("../models/user");
-const { execController } = require("../helpers");
-
-const skipNext = () => {};
+const { execController, skipNext } = require("../helpers");
 
 const findAll = () => execController(skipNext, User.find().lean());
 
@@ -15,7 +13,7 @@ const create = (user) =>
     async () => await User.create(user),
     User.findOneAndUpdate(
       user,
-      { password: SHA256(user.password) },
+      { $set: { password: SHA256(user.password) } },
       { new: true, useFindAndModify: false }
     )
   );

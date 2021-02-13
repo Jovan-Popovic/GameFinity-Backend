@@ -81,6 +81,6 @@ const gameSchema = new mongoose.Schema(
   { collection: "games", retainNullValues: true, timestamps: true }
 );
 
-userSchema.index({ name: 1 }, { unique: true });
+gameSchema.index({ name: 1 }, { unique: true });
 
 module.exports = mongoose.model("game", gameSchema);

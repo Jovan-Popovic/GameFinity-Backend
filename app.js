@@ -20,6 +20,7 @@ const app = express();
 
 app.use(json());
 
+//Root route
 app.get("/", (req, res) =>
   execRequest(req, res, 400, () => {
     const data = {
@@ -32,6 +33,7 @@ app.get("/", (req, res) =>
   })
 );
 
+//Authentication route
 app.post("/login", (req, res) =>
   execRequest(req, res, 400, async () => {
     const { body } = req;
@@ -45,8 +47,9 @@ app.post("/login", (req, res) =>
   })
 );
 
-app.get("/users", verifyToken, (req, res) => {
-  privateRequest(req, res, 404, async () => {
+//User routes
+app.get("/users", (req, res) => {
+  execRequest(req, res, 404, async () => {
     const users = await User.findAll();
     res.status(200).json(users);
   });
@@ -86,6 +89,39 @@ app.delete("/user/:username", verifyToken, (req, res) => {
     const user = await User.deleteOne({ username });
     res.status(200).json(user);
   });
+});
+
+//Game routes
+app.get("/games", (req, res) => {
+  execRequest(req, res, 404, async () => {
+    const { limit, offset } = req.query;
+    const games = await Game.findAll(limit, offset);
+    res.status(200).json(games);
+  });
+});
+
+app.get("/game/:name", verifyToken, (req, res) => {
+  privateRequest(req, res, 404, async () => {
+    const { name } = req.params;
+    const game = await Game.findOne({ name });
+    res.status(200).json(game);
+  });
+});
+//Last 3 routes are not finished, just setted up 
+app.post("/game", verifyToken, (req, res) => {
+  privateRequest(req, res, 400, async () => {
+    const { body } = req;
+    const game = await Game.create(body);
+    res.status(201).json(game);
+  });
+});
+
+app.put("/game/:name", verifyToken, (req, res) => {
+  privateRequest(req, res, 400, async () => {});
+});
+
+app.delete("/game/:name", verifyToken, (req, res) => {
+  privateRequest(req, res, 400, async () => {});
 });
 
 const PORT = process.env.PORT || 5000;

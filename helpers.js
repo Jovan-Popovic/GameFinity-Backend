@@ -54,6 +54,8 @@ const privateRequest = (req, res, status, action) => {
   }
 };
 
+const skipNext = () => {};
+
 module.exports = {
   connect,
   sign,
@@ -61,4 +63,5 @@ module.exports = {
   execController,
   execRequest,
   privateRequest,
+  skipNext,
 };
