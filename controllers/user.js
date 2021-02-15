@@ -5,8 +5,8 @@ const { execController, skipNext } = require("../helpers");
 
 const findAll = () => execController(skipNext, User.find().lean());
 
-const findOne = (prop, filter) =>
-  execController(skipNext, User.findOne(prop, filter));
+const findOne = (filter, data) =>
+  execController(skipNext, User.findOne(filter, data));
 
 const create = (user) =>
   execController(

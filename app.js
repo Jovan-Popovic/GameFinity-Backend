@@ -26,7 +26,8 @@ app.get("/", (req, res) =>
       title: "Welcome to GameFinity API",
       description:
         "GameFinity is a console games shop, the purpose of this application is to master the skills that we obtained through the Web Development - Backend course.",
-      note: "If you want to get access to all of the the routes, you will need a JWT!",
+      note:
+        "If you want to get access to all of the the routes, you will need a JWT!",
     };
     res.status(200).json(data);
   })
@@ -46,28 +47,28 @@ app.post("/login", (req, res) =>
 );
 
 //User routes
-app.get("/users", (req, res) => {
+app.get("/users", (req, res) =>
   execRequest(req, res, 404, async () => {
     const users = await User.findAll();
     res.status(200).json(users);
-  });
-});
+  })
+);
 
-app.get("/user/:username", verifyToken, (req, res) => {
+app.get("/user/:username", verifyToken, (req, res) =>
   privateRequest(req, res, 404, async () => {
     const { username } = req.params;
     const user = await User.findOne({ username });
     res.status(200).json(user);
-  });
-});
+  })
+);
 
-app.post("/user", (req, res) => {
+app.post("/user", (req, res) =>
   execRequest(req, res, 400, async () => {
     const { body } = req;
     const user = await User.create(body);
     res.status(201).json(user);
-  });
-});
+  })
+);
 
 app.put("/user/:username", verifyToken, (req, res) =>
   privateRequest(req, res, 400, async () => {
@@ -78,55 +79,96 @@ app.put("/user/:username", verifyToken, (req, res) =>
   })
 );
 
-app.delete("/user/:username", verifyToken, (req, res) => {
+app.delete("/user/:username", verifyToken, (req, res) =>
   privateRequest(req, res, 400, async () => {
     const { username } = req.params;
     const user = await User.deleteOne({ username });
     res.status(200).json(user);
-  });
-});
+  })
+);
 
 //Game routes
-app.get("/games", (req, res) => {
+app.get("/games", (req, res) =>
   execRequest(req, res, 404, async () => {
     const { limit, offset } = req.query;
     const games = await Game.findAll(limit, offset);
     res.status(200).json(games);
-  });
-});
+  })
+);
 
-app.get("/game/:name", verifyToken, (req, res) => {
+app.get("/game/:name", verifyToken, (req, res) =>
   privateRequest(req, res, 404, async () => {
     const { name } = req.params;
     const game = await Game.findOne({ name });
     res.status(200).json(game);
-  });
-});
+  })
+);
 
-app.post("/game", verifyToken, (req, res) => {
+app.post("/game", verifyToken, (req, res) =>
   privateRequest(req, res, 400, async () => {
     const { body } = req;
     const game = await Game.create(body);
     res.status(201).json(game);
-  });
-});
+  })
+);
 
-app.put("/game/:name", verifyToken, (req, res) => {
+app.put("/game/:name", verifyToken, (req, res) =>
   privateRequest(req, res, 400, async () => {
     const { name } = req.params;
     const { body } = req;
     const game = await Game.findOneAndUpdate({ name }, { $set: body });
     res.status(201).json(game);
-  });
-});
+  })
+);
 
-app.delete("/game/:name", verifyToken, (req, res) => {
+app.delete("/game/:name", verifyToken, (req, res) =>
   privateRequest(req, res, 400, async () => {
     const { name } = req.params;
     const game = await Game.deleteOne({ name });
     res.status(200).json(game);
-  });
-});
+  })
+);
+
+//Comment routes
+app.get("/comments", verifyToken, (req, res) =>
+  privateRequest(req, res, 400, async () => {
+    const comment = await Comment.findAll();
+    res.status(200).json(comment);
+  })
+);
+
+app.get("/comment/:_id", verifyToken, (req, res) =>
+  privateRequest(req, res, 404, async () => {
+    const { _id } = req.params;
+    const game = await Comment.findOne({ _id });
+    res.status(200).json(game);
+  })
+);
+
+app.post("/comment", verifyToken, (req, res) =>
+  privateRequest(req, res, 400, async () => {
+    const { body } = req;
+    const comment = await Comment.create(body);
+    res.status(201).json(comment);
+  })
+);
+
+app.put("/comment/:_id", verifyToken, (req, res) =>
+  privateRequest(req, res, 400, async () => {
+    const { _id } = req.params;
+    const { body } = req;
+    const comment = await Comment.findOneAndUpdate({ _id }, { $set: body });
+    res.status(201).json(comment);
+  })
+);
+
+app.delete("/comment/:_id", verifyToken, (req, res) =>
+  privateRequest(req, res, 400, async () => {
+    const { _id } = req.params;
+    const comment = await Comment.deleteOne({ _id });
+    res.status(200).json(comment);
+  })
+);
 
 const PORT = process.env.PORT || 5000;
 

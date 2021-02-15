@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const commentSchema = new mongoose.Schema(
   {
     postedOn: String,
-    postedId: {
+    postedOnId: {
       type: mongoose.Schema.Types.ObjectId,
       refPath: "postedOn",
       required: true,

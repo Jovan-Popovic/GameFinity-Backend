@@ -8,7 +8,8 @@ const findAll = (limit = 0, offset = 0) =>
     Game.find().skip(parseInt(offset)).limit(parseInt(limit))
   );
 
-const findOne = (filter) => execController(skipNext, Game.findOne(filter));
+const findOne = (filter, data) =>
+  execController(skipNext, Game.findOne(filter, data));
 
 const create = (game) =>
   execController(async () => {

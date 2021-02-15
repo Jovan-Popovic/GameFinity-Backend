@@ -4,7 +4,7 @@
 
 GameFinity is a console games shop, the purpose of this application is to master the skills that we obtained through the Web Development - Backend course.
 
-Frontend developers: Snezana Nikolic, Nemanja Riganovic, Luka Marojevic. <br/>
+Frontend developers: Snezana Nikolic, Nemanja Roganovic, Luka Marojevic. <br/>
 Backend developers: Jovan Popovic, Alan Adzagic.
 
 Click [here]() to visit our application (its not hosted yet). <br/>
@@ -14,13 +14,13 @@ Down bellow you can see all the requests that frontend is be using.
 
 ## User requests
 
-- `POST /login` - Authenticate the user and return token.
-
 - `GET /users` - Get all the users, authentication required.
 
 - `GET /user/:username` - Get the user by username, authentication required.
 
-- `POST /user/` - Create a new user, no authentication required.
+- `POST /user` - Create a new user, no authentication required.
+
+- `POST /login` - Authenticate the user and return token.
 
 - `PUT /user/:username` - Update the user by username, authenticaton required.
 
@@ -32,11 +32,11 @@ Down bellow you can see all the requests that frontend is be using.
 
 - `GET /games?limit=0&offset=0` - Get all the games with queries, no authentication required.
 
-- `GET /game/:name` - Get the game by name, no authentication required.
+- `GET /game/:name` - Get the game by name, authentication required.
 
-- `POST /game?user` - Create the game by name, authentication required.
+- `POST /game` - Create the game, authentication required.
 
-- `PUT /game/:name` - Update the game by username, authenticaton required.
+- `PUT /game/:name` - Update the game by name, authenticaton required.
 
 - `DELETE /game/:name` - Delete the game by name, authenticaton required.
 
@@ -46,4 +46,12 @@ Down bellow you can see all the requests that frontend is be using.
 
 ## Comment requests
 
-- Still in development :)
+- `GET /comments` - Get all the comments, authentication required.
+
+- `GET /comment/:_id` - Get the comment by id, authentication required.
+
+- `POST /comment` - Create the comment, authentication required.
+
+- `PUT /comment/:_id` - Update the comment by id, authenticaton required.
+
+- `DELETE /comment/:_id` - Delete the comment by id, authenticaton required.
