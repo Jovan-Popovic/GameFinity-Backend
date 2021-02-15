@@ -5,7 +5,6 @@ require("dotenv").config();
 
 const User = require("./controllers/user");
 const Game = require("./controllers/game");
-const Requirements = require("./controllers/requirements");
 const Comment = require("./controllers/comment");
 const Transaction = require("./controllers/transaction");
 const {
@@ -22,12 +21,12 @@ app.use(json());
 
 //Root route
 app.get("/", (req, res) =>
-  execRequest(req, res, 400, () => {
+  execRequest(req, res, 500, () => {
     const data = {
       title: "Welcome to GameFinity API",
       description:
         "GameFinity is a console games shop, the purpose of this application is to master the skills that we obtained through the Web Development - Backend course.",
-      note: "If you want to get access to the routes, you will need a JWT!",
+      note: "If you want to get access to all of the the routes, you will need a JWT!",
     };
     res.status(200).json(data);
   })
@@ -42,7 +41,6 @@ app.post("/login", (req, res) =>
       "email",
       "password",
     ]);
-    console.log(user);
     sign(user, res);
   })
 );
@@ -75,10 +73,7 @@ app.put("/user/:username", verifyToken, (req, res) =>
   privateRequest(req, res, 400, async () => {
     const { username } = req.params;
     const { body } = req;
-    const user = await User.findOneAndUpdate(
-      { username },
-      { $set: { ...body } }
-    );
+    const user = await User.findOneAndUpdate({ username }, { $set: body });
     res.status(201).json(user);
   })
 );
@@ -107,7 +102,7 @@ app.get("/game/:name", verifyToken, (req, res) => {
     res.status(200).json(game);
   });
 });
-//Last 3 routes are not finished, just setted up 
+
 app.post("/game", verifyToken, (req, res) => {
   privateRequest(req, res, 400, async () => {
     const { body } = req;
@@ -117,11 +112,20 @@ app.post("/game", verifyToken, (req, res) => {
 });
 
 app.put("/game/:name", verifyToken, (req, res) => {
-  privateRequest(req, res, 400, async () => {});
+  privateRequest(req, res, 400, async () => {
+    const { name } = req.params;
+    const { body } = req;
+    const game = await Game.findOneAndUpdate({ name }, { $set: body });
+    res.status(201).json(game);
+  });
 });
 
 app.delete("/game/:name", verifyToken, (req, res) => {
-  privateRequest(req, res, 400, async () => {});
+  privateRequest(req, res, 400, async () => {
+    const { name } = req.params;
+    const game = await Game.deleteOne({ name });
+    res.status(200).json(game);
+  });
 });
 
 const PORT = process.env.PORT || 5000;

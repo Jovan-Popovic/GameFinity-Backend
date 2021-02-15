@@ -24,10 +24,10 @@ const verifyToken = (req, res, next) => {
 };
 
 const execController = (next, data) =>
-  new Promise((res, rej) => {
+  new Promise(async (res, rej) => {
     try {
-      next();
-      res(data);
+      await next();
+      res(await data);
     } catch (err) {
       console.log(err);
       rej(new Error(err));

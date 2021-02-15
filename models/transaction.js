@@ -2,17 +2,17 @@ const mongoose = require("mongoose");
 
 const transactionSchema = new mongoose.Schema(
   {
-    gameId: {
+    game: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "game",
       required: true,
     },
-    buyerId: {
+    buyer: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
       required: true,
     },
-    sellerId: {
+    seller: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
       required: true,

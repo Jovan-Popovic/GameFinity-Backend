@@ -2,20 +2,15 @@ const mongoose = require("mongoose");
 
 const gameSchema = new mongoose.Schema(
   {
-    userId: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
       default: undefined,
     },
-    creatorId: {
+    creator: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
       default: undefined,
-    },
-    requirementsId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "requirements",
-      required: true,
     },
     name: {
       type: String,
@@ -41,10 +36,15 @@ const gameSchema = new mongoose.Schema(
         required: true,
       },
     ],
-    image: String,
+    image: {
+      type: String,
+      required: true,
+      default: "",
+    },
     state: {
       type: String,
       required: true,
+      default: "new",
     },
     quantity: {
       type: Number,

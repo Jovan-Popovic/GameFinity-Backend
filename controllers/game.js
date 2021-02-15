@@ -9,7 +9,7 @@ const findAll = (limit = 0, offset = 0) =>
   );
 
 const findOne = (filter) => execController(skipNext, Game.findOne(filter));
-//Requests below are not finished
+
 const create = (game) =>
   execController(async () => {
     await Game.create(game);
@@ -17,25 +17,34 @@ const create = (game) =>
       { _id: game.user },
       {
         $push: {
-          product: await Product.findOne(game, ["_id"]),
+          game: await Game.findOne(game, ["_id"]),
         },
-      }
-    )
-      .populate("product")
-      .exec();
-  }, Game.findOne(game).populate("user").exec());
+      },
+      { useFindAndModify: false }
+    ).populate("game");
+  }, Game.findOne(game).populate("user").populate("creator"));
 
 const findOneAndUpdate = (filter, update) =>
   execController(
     skipNext,
     Game.findOneAndUpdate(filter, update, {
-      upsert: true,
       new: true,
       useFindAndModify: false,
     })
   );
 
-const deleteOne = (filter) => execController(skipNext, Game.deleteOne(Filter));
+const deleteOne = (filter) =>
+  execController(async () => {
+    const { user, _id } = await Game.findOne(filter, ["user", "_id"]);
+    await User.findOneAndUpdate(
+      { _id: user },
+      {
+        $pull: {
+          game: _id,
+        },
+      }
+    );
+  }, Game.deleteOne(filter));
 
 module.exports = {
   findAll,
