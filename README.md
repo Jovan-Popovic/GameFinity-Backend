@@ -14,31 +14,31 @@ Down bellow you can see all the requests that frontend is be using.
 
 ## User requests
 
-- ### `POST /login` - Authenticate the user and return token.
+- `POST /login` - Authenticate the user and return token.
 
-- ### `GET /users` - Get all the users, authentication required.
+- `GET /users` - Get all the users, authentication required.
 
-- ### `GET /user/:username` - Get the user by username, authentication required.
+- `GET /user/:username` - Get the user by username, authentication required.
 
-- ### `POST /user/` - Create a new user, no authentication required.
+- `POST /user/` - Create a new user, no authentication required.
 
-- ### `PUT /user/:username` - Update the user by username, authenticaton required.
+- `PUT /user/:username` - Update the user by username, authenticaton required.
 
-- ### `DELETE /user/:username` - Delete the user by username, authenticaton required.
+- `DELETE /user/:username` - Delete the user by username, authenticaton required.
 
 ## Game requests
 
-- ### `GET /games` - Get all the games, no authentication required.
+- `GET /games` - Get all the games, no authentication required.
 
-- ### `GET /games?limit=0&offset=0` - Get all the games with queries, no authentication required.
+- `GET /games?limit=0&offset=0` - Get all the games with queries, no authentication required.
 
-- ### `GET /game/:name` - Get the game by name, no authentication required.
+- `GET /game/:name` - Get the game by name, no authentication required.
 
-- ### `POST /game?user` - Create the game by name, authentication required.
+- `POST /game?user` - Create the game by name, authentication required.
 
-- ### `PUT /game/:name` - Update the game by username, authenticaton required.
+- `PUT /game/:name` - Update the game by username, authenticaton required.
 
-- ### `DELETE /game/:name` - Delete the game by name, authenticaton required.
+- `DELETE /game/:name` - Delete the game by name, authenticaton required.
 
 ## Transaction requests
 
