@@ -19,7 +19,7 @@ const app = express();
 
 app.use(json());
 
-//Root route
+// Root route
 app.get("/", (req, res) =>
   execRequest(req, res, 500, () => {
     const data = {
@@ -33,7 +33,7 @@ app.get("/", (req, res) =>
   })
 );
 
-//Authentication route
+// Authentication route
 app.post("/login", (req, res) =>
   execRequest(req, res, 400, async () => {
     const { body } = req;
@@ -46,7 +46,7 @@ app.post("/login", (req, res) =>
   })
 );
 
-//User routes
+// User routes
 app.get("/users", (req, res) =>
   execRequest(req, res, 404, async () => {
     const users = await User.findAll();
@@ -87,7 +87,7 @@ app.delete("/user/:username", verifyToken, (req, res) =>
   })
 );
 
-//Game routes
+// Game routes
 app.get("/games", (req, res) =>
   execRequest(req, res, 404, async () => {
     const { limit, offset } = req.query;
@@ -129,11 +129,11 @@ app.delete("/game/:name", verifyToken, (req, res) =>
   })
 );
 
-//Comment routes
+// Comment routes
 app.get("/comments", verifyToken, (req, res) =>
   privateRequest(req, res, 400, async () => {
-    const comment = await Comment.findAll();
-    res.status(200).json(comment);
+    const comments = await Comment.findAll();
+    res.status(200).json(comments);
   })
 );
 
@@ -170,9 +170,53 @@ app.delete("/comment/:_id", verifyToken, (req, res) =>
   })
 );
 
+// Transaction routes
+app.get("/transactions", verifyToken, (req, res) =>
+  privateRequest(req, res, 400, async () => {
+    const transactions = await Transaction.findAll();
+    res.status(200).json(transactions);
+  })
+);
+
+app.get("/transaction/:_id", verifyToken, (req, res) =>
+  privateRequest(req, res, 404, async () => {
+    const { _id } = req.params;
+    const transaction = await Transaction.findOne({ _id });
+    res.status(200).json(transaction);
+  })
+);
+
+app.post("/transaction", verifyToken, (req, res) =>
+  privateRequest(req, res, 400, async () => {
+    const { body } = req;
+    const transaction = await Transaction.create(body);
+    res.status(201).json(transaction);
+  })
+);
+
+app.put("/transaction/:_id", verifyToken, (req, res) =>
+  privateRequest(req, res, 400, async () => {
+    const { _id } = req.params;
+    const { body } = req;
+    const transaction = await Transaction.findOneAndUpdate(
+      { _id },
+      { $set: body }
+    );
+    res.status(201).json(transaction);
+  })
+);
+
+app.delete("/transaction/:_id", verifyToken, (req, res) =>
+  privateRequest(req, res, 400, async () => {
+    const { _id } = req.params;
+    const transaction = await Transaction.deleteOne({ _id });
+    res.status(200).json(transaction);
+  })
+);
+
 const PORT = process.env.PORT || 5000;
 
-//Connecting to the server
+// Connecting to the server
 connect(process.env.DB_URI)
   .then(() =>
     app.listen(PORT, () =>
