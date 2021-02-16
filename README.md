@@ -40,10 +40,6 @@ Down bellow you can see all the requests that frontend is be using.
 
 - `DELETE /game/:name` - Delete the game by name, authenticaton required.
 
-## Transaction requests
-
-- Still in development :)
-
 ## Comment requests
 
 - `GET /comments` - Get all the comments, authentication required.
@@ -55,3 +51,15 @@ Down bellow you can see all the requests that frontend is be using.
 - `PUT /comment/:_id` - Update the comment by id, authenticaton required.
 
 - `DELETE /comment/:_id` - Delete the comment by id, authenticaton required.
+
+## Transaction requests
+
+- `GET /transactions` - Get all the transactions, authentication required.
+
+- `GET /transaction/:_id` - Get the transaction by id, authentication required.
+
+- `POST /transaction` - Create the transaction, authentication required.
+
+- `PUT /transaction/:_id` - Update the transaction by id, authenticaton required.
+
+- `DELETE /transaction/:_id` - Delete the transaction by id, authenticaton required.
