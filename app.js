@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const { json } = require("body-parser");
 const CryptoJS = require("crypto-js");
 require("dotenv").config();
@@ -18,6 +19,7 @@ const {
 const app = express();
 
 app.use(json());
+app.use(cors());
 
 // Root route
 app.get("/", (req, res) =>
