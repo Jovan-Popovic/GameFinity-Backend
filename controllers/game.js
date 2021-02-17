@@ -1,5 +1,7 @@
 const User = require("../models/user");
 const Game = require("../models/game");
+const Comment = require("../models/comment");
+const Transaction = require("../models/transaction");
 const { execController, skipNext } = require("../helpers");
 
 const findAll = (limit = 0, offset = 0) =>
@@ -36,15 +38,17 @@ const findOneAndUpdate = (filter, update) =>
 
 const deleteOne = (filter) =>
   execController(async () => {
-    const { user, _id } = await Game.findOne(filter, ["user", "_id"]);
+    const game = await Game.findOne(filter);
     await User.findOneAndUpdate(
-      { _id: user },
+      { _id: game.user },
       {
         $pull: {
-          game: _id,
+          game: game._id,
         },
       }
     );
+    await Comment.deleteMany({ postedOn: "game", postedOnId: game._id });
+    await Transaction.deleteMany({ game: game._id });
   }, Game.deleteOne(filter));
 
 module.exports = {

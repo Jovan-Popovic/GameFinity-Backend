@@ -1,14 +1,12 @@
 # GameFinity - Backend
 
-## What is GameFinity?
-
 GameFinity is a console games shop, the purpose of this application is to master the skills that we obtained through the Web Development - Backend course.
 
 Frontend developers: Snezana Nikolic, Nemanja Roganovic, Luka Marojevic. <br/>
 Backend developers: Jovan Popovic, Alan Adzagic.
 
 Click [here]() to visit our application (its not hosted yet). <br/>
-Click [here](https://gamefinity-api.herokuapp.com/) to visit our API (currently deployed with Heroku).
+Click <a href="https://gamefinity-api.herokuapp.com/" target="_blank">here</a> to visit our API (currently deployed with Heroku).
 
 Down bellow you can see all the requests that frontend is be using.
 

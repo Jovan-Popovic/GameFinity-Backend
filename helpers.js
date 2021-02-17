@@ -1,19 +1,22 @@
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 
-//Connect with the database
+// Connect with the database
 const connect = (uri) =>
   mongoose.connect(uri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
 
+// Sign the JWT
 const sign = (user, res) =>
-  jwt.sign({ user }, "secretkey", { expiresIn: "3h" }, (err, token) =>
-    !err ? res.status(201).json({ token }) : res.status(404).json(err)
-  );
+  user
+    ? jwt.sign({ user }, "secretkey", { expiresIn: "3h" }, (err, token) =>
+        !err ? res.status(201).json({ token }) : res.status(404).json(err)
+      )
+    : res.status(404).json({ error: "Wrong email or password" });
 
-//Verify token for every api request (except for creating the user)
+// Verify token for every api request (except for creating the user)
 const verifyToken = (req, res, next) => {
   const authorization = req.headers["authorization"];
   if (typeof authorization !== "undefined") {
@@ -23,6 +26,7 @@ const verifyToken = (req, res, next) => {
   } else res.sendStatus(403);
 };
 
+// To reduce controllers
 const execController = (next, data) =>
   new Promise(async (res, rej) => {
     try {
@@ -34,6 +38,10 @@ const execController = (next, data) =>
     }
   });
 
+// Skip next in execControllers
+const skipNext = () => {};
+
+// To reduce public requests
 const execRequest = (req, res, status, action) => {
   try {
     action();
@@ -43,6 +51,7 @@ const execRequest = (req, res, status, action) => {
   }
 };
 
+// To reduce private requests
 const privateRequest = (req, res, status, action) => {
   try {
     jwt.verify(req.token, "secretkey", async (err) => {
@@ -54,14 +63,12 @@ const privateRequest = (req, res, status, action) => {
   }
 };
 
-const skipNext = () => {};
-
 module.exports = {
   connect,
   sign,
   verifyToken,
   execController,
+  skipNext,
   execRequest,
   privateRequest,
-  skipNext,
 };

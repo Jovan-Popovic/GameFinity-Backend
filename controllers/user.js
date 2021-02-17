@@ -1,6 +1,9 @@
 const { SHA256 } = require("crypto-js");
 
 const User = require("../models/user");
+const Game = require("../models/game");
+const Comment = require("../models/comment");
+const Transaction = require("../models/transaction");
 const { execController, skipNext } = require("../helpers");
 
 const findAll = () => execController(skipNext, User.find().lean());
@@ -31,7 +34,15 @@ const findOneAndUpdate = (filter, update) =>
     )
   );
 
-const deleteOne = (filter) => execController(skipNext, User.deleteOne(filter));
+const deleteOne = (filter) =>
+  execController(async () => {
+    const user = await User.findOne(filter);
+    await Game.deleteMany({ user: user._id });
+    await Comment.deleteMany({ postedBy: user._id });
+    await Comment.deleteMany({ postedOn: "user", postedOnId: user._id });
+    await Transaction.deleteMany({ buyer: user._id });
+    await Transaction.deleteMany({ seller: user._id });
+  }, User.deleteOne(filter));
 
 module.exports = {
   findAll,

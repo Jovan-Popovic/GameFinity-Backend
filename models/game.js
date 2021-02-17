@@ -78,7 +78,7 @@ const gameSchema = new mongoose.Schema(
       },
     },
   },
-  { collection: "games", retainNullValues: true, timestamps: true }
+  { collection: "games", timestamps: true }
 );
 
 gameSchema.index({ name: 1 }, { unique: true });
