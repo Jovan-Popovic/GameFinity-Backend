@@ -26,21 +26,6 @@ const verifyToken = (req, res, next) => {
   } else res.sendStatus(403);
 };
 
-// To reduce controllers
-const execController = (next, data) =>
-  new Promise(async (res, rej) => {
-    try {
-      await next();
-      res(await data);
-    } catch (err) {
-      console.log(err);
-      rej(new Error(err));
-    }
-  });
-
-// Skip next in execControllers
-const skipNext = () => {};
-
 // To reduce public requests
 const execRequest = (req, res, status, action) => {
   try {
@@ -67,8 +52,6 @@ module.exports = {
   connect,
   sign,
   verifyToken,
-  execController,
-  skipNext,
   execRequest,
   privateRequest,
 };

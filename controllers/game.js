@@ -2,7 +2,7 @@ const User = require("../models/user");
 const Game = require("../models/game");
 const Comment = require("../models/comment");
 const Transaction = require("../models/transaction");
-const { execController, skipNext } = require("../helpers");
+const { execController, skipNext } = require("../helpers/controller");
 
 const findAll = (limit = 0, offset = 0) =>
   execController(
@@ -25,7 +25,7 @@ const create = (game) =>
       },
       { useFindAndModify: false }
     ).populate("game");
-  }, Game.findOne(game).populate("user").populate("creator"));
+  }, Game.findOne(game).populate("user"));
 
 const findOneAndUpdate = (filter, update) =>
   execController(

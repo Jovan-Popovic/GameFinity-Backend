@@ -1,5 +1,5 @@
 const Comment = require("../models/comment");
-const { execController, skipNext } = require("../helpers");
+const { execController, skipNext } = require("../helpers/controller");
 
 const findAll = () => execController(skipNext, Comment.find().lean());
 

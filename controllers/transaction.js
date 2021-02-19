@@ -1,5 +1,5 @@
 const Transaction = require("../models/transaction");
-const { execController, skipNext } = require("../helpers");
+const { execController, skipNext } = require("../helpers/controller");
 
 const findAll = () => execController(skipNext, Transaction.find().lean());
 

@@ -1,6 +1,7 @@
 const express = require("express");
+const fileUpload = require("express-fileupload");
 const cors = require("cors");
-const { json } = require("body-parser");
+const bodyParser = require("body-parser");
 const CryptoJS = require("crypto-js");
 require("dotenv").config();
 
@@ -14,18 +15,20 @@ const {
   verifyToken,
   execRequest,
   privateRequest,
-} = require("./helpers");
+} = require("./helpers/api");
 
 const app = express();
 
-app.use(json());
+app.use(fileUpload());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
 // Root route
 app.get("/", (req, res) =>
   execRequest(req, res, 500, () => {
     const data = {
-      title: "Welcome to GameFinity API",
+      title: "Welcome to GameFinity's API",
       description:
         "GameFinity is a console games shop, the purpose of this application is to master the skills that we obtained through the Web Development - Backend course.",
       note:
@@ -49,8 +52,8 @@ app.post("/login", (req, res) =>
 );
 
 // User routes
-app.get("/users", (req, res) =>
-  execRequest(req, res, 404, async () => {
+app.get("/users", verifyToken, (req, res) =>
+  privateRequest(req, res, 404, async () => {
     const users = await User.findAll();
     res.status(200).json(users);
   })

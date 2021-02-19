@@ -8,9 +8,10 @@ const gameSchema = new mongoose.Schema(
       default: undefined,
     },
     creator: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
-      default: undefined,
+      type: String,
+      minlength: 5,
+      maxlength: 20,
+      default: "Unknown",
     },
     name: {
       type: String,

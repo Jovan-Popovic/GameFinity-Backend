@@ -4,7 +4,7 @@ const User = require("../models/user");
 const Game = require("../models/game");
 const Comment = require("../models/comment");
 const Transaction = require("../models/transaction");
-const { execController, skipNext } = require("../helpers");
+const { execController, skipNext } = require("../helpers/controller");
 
 const findAll = () => execController(skipNext, User.find().lean());
 
