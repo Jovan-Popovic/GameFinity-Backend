@@ -1,5 +1,3 @@
-const { google } = require("googleapis");
-
 // To reduce controllers
 const execController = (next, data) =>
   new Promise(async (res, rej) => {
@@ -15,6 +13,4 @@ const execController = (next, data) =>
 // Skip next in execController
 const skipNext = () => {};
 
-const imageUpload = () => {};
-
-module.exports = { skipNext, execController, imageUpload };
+module.exports = { skipNext, execController };

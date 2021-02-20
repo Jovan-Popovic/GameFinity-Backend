@@ -5,13 +5,18 @@ const Game = require("../models/game");
 const Comment = require("../models/comment");
 const Transaction = require("../models/transaction");
 const { execController, skipNext } = require("../helpers/controller");
+const {
+  uploadImage,
+  generatePublicUrl,
+  deleteImage,
+} = require("../helpers/upload");
 
 const findAll = () => execController(skipNext, User.find().lean());
 
 const findOne = (filter, data) =>
   execController(skipNext, User.findOne(filter, data));
 
-const create = (user) =>
+const create = (user, image) =>
   execController(
     async () => await User.create(user),
     User.findOneAndUpdate(
