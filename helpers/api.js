@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
+const { SECRET_KEY } = process.env;
 // Connect with the database
 const connect = (uri) =>
   mongoose.connect(uri, {
@@ -11,7 +13,7 @@ const connect = (uri) =>
 // Sign the JWT
 const sign = (user, res) =>
   user
-    ? jwt.sign({ user }, "secretkey", { expiresIn: "3h" }, (err, token) =>
+    ? jwt.sign({ user }, SECRET_KEY, { expiresIn: "3h" }, (err, token) =>
         !err ? res.status(201).json({ token }) : res.status(404).json(err)
       )
     : res.status(404).json({ error: "Wrong email or password" });
@@ -39,7 +41,7 @@ const execRequest = (req, res, status, action) => {
 // To reduce private requests
 const privateRequest = (req, res, status, action) => {
   try {
-    jwt.verify(req.token, "secretkey", async (err) => {
+    jwt.verify(req.token, SECRET_KEY, async (err) => {
       !err ? execRequest(req, res, status, action) : res.status(403).json(err);
     });
   } catch (err) {
