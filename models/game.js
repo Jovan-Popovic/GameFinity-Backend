@@ -27,7 +27,6 @@ const gameSchema = new mongoose.Schema(
     genre: [
       {
         type: String,
-        required: true,
       },
     ],
     consoleType: [

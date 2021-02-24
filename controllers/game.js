@@ -51,10 +51,16 @@ const deleteOne = (filter) =>
     await Transaction.deleteMany({ game: game._id });
   }, Game.deleteOne(filter));
 
+const findAllByUserId = async (userId) => {
+    const byUser = await Game.find({ "user": userId })
+    return byUser
+  }
+
 module.exports = {
   findAll,
   findOne,
   create,
   findOneAndUpdate,
   deleteOne,
+  findAllByUserId,
 };

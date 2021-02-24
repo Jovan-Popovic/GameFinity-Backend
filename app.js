@@ -70,8 +70,8 @@ app.get("/user/:username", verifyToken, (req, res) =>
 app.post("/user", (req, res) =>
   execRequest(req, res, 400, async () => {
     const { body } = req;
-    const { profilePic } = req.files;
-    const user = await User.create(body, profilePic);
+    //const { profilePic } = req.files;
+    const user = await User.create(body);
     res.status(201).json(user);
   })
 );
