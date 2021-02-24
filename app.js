@@ -1,7 +1,8 @@
 const express = require("express");
 const fileUpload = require("express-fileupload");
+const compression = require("compression");
 const cors = require("cors");
-const bodyParser = require("body-parser");
+const { json } = require("body-parser");
 const CryptoJS = require("crypto-js");
 require("dotenv").config();
 
@@ -19,9 +20,9 @@ const {
 
 const app = express();
 
+app.use(compression());
 app.use(fileUpload());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(json());
 app.use(cors());
 
 // Root route
@@ -70,9 +71,23 @@ app.get("/user/:username", verifyToken, (req, res) =>
 app.post("/user", (req, res) =>
   execRequest(req, res, 400, async () => {
     const { body } = req;
-    const { profilePic } = req.files;
-    const user = await User.create(body, profilePic);
-    res.status(201).json(user);
+    const {
+      profilePic,
+      profilePic: { name, mimetype },
+    } = req.files;
+    const uploadPath = `${__dirname}/helpers/${name}`;
+    const error = {
+      error: "Wrong file type uploaded",
+      message: "You can only upload JPG, JPEG or PNG file!",
+    };
+    mimetype === "image/jpg" ||
+    mimetype === "image/jpeg" ||
+    mimetype === "image/png"
+      ? await profilePic.mv(uploadPath, async () => {
+          const user = await User.create(body, profilePic);
+          res.status(201).json(user);
+        })
+      : res.status(400).json(error);
   })
 );
 

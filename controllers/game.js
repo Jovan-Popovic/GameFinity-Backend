@@ -38,17 +38,17 @@ const findOneAndUpdate = (filter, update) =>
 
 const deleteOne = (filter) =>
   execController(async () => {
-    const game = await Game.findOne(filter);
+    const { user, _id } = await Game.findOne(filter);
     await User.findOneAndUpdate(
-      { _id: game.user },
+      { _id: user },
       {
         $pull: {
-          game: game._id,
+          game: _id,
         },
       }
     );
-    await Comment.deleteMany({ postedOn: "game", postedOnId: game._id });
-    await Transaction.deleteMany({ game: game._id });
+    await Comment.deleteMany({ postedOn: "game", postedOnId: _id });
+    await Transaction.deleteMany({ game: _id });
   }, Game.deleteOne(filter));
 
 module.exports = {
