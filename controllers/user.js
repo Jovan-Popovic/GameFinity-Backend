@@ -16,10 +16,10 @@ const findAll = () => execController(skipNext, User.find().lean());
 const findOne = (filter, data) =>
   execController(skipNext, User.findOne(filter, data));
 
-const create = (user, image) =>
+const create = (user, file) =>
   execController(async () => {
     const profilePic = await uploadImage(
-      image,
+      file,
       "12_uStN3tcRRPbpwph3_qqfowUY5ndwxm"
     );
     console.log(profilePic);
@@ -41,12 +41,14 @@ const findOneAndUpdate = (filter, update) =>
 
 const deleteOne = (filter) =>
   execController(async () => {
-    const { _id } = await User.findOne(filter);
+    const { _id, profilePic } = await User.findOne(filter);
     await Game.deleteMany({ user: _id });
     await Comment.deleteMany({ postedBy: _id });
     await Comment.deleteMany({ postedOn: "user", postedOnId: _id });
     await Transaction.deleteMany({ buyer: _id });
     await Transaction.deleteMany({ seller: _id });
+    if (profilePic !== "https://www.computerhope.com/jargon/g/guest-user.jpg")
+      await deleteImage(profilePic);
   }, User.deleteOne(filter));
 
 module.exports = {

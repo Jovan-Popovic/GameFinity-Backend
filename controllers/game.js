@@ -2,7 +2,12 @@ const User = require("../models/user");
 const Game = require("../models/game");
 const Comment = require("../models/comment");
 const Transaction = require("../models/transaction");
-const { execController, skipNext } = require("../helpers/controller");
+const {
+  execController,
+  skipNext,
+  uploadImage,
+  deleteImage,
+} = require("../helpers/controller");
 
 const findAll = (limit = 0, offset = 0) =>
   execController(
@@ -13,9 +18,10 @@ const findAll = (limit = 0, offset = 0) =>
 const findOne = (filter, data) =>
   execController(skipNext, Game.findOne(filter, data));
 
-const create = (game) =>
+const create = (game, file) =>
   execController(async () => {
-    await Game.create(game);
+    const image = await uploadImage(file, "1GWaB-McnGh3L1L3ICQkC0ek7o7GMEHg0");
+    await Game.create({ ...game, image });
     await User.findOneAndUpdate(
       { _id: game.user },
       {
@@ -38,7 +44,7 @@ const findOneAndUpdate = (filter, update) =>
 
 const deleteOne = (filter) =>
   execController(async () => {
-    const { user, _id } = await Game.findOne(filter);
+    const { _id, user, image } = await Game.findOne(filter);
     await User.findOneAndUpdate(
       { _id: user },
       {
@@ -49,6 +55,7 @@ const deleteOne = (filter) =>
     );
     await Comment.deleteMany({ postedOn: "game", postedOnId: _id });
     await Transaction.deleteMany({ game: _id });
+    await deleteImage(image);
   }, Game.deleteOne(filter));
 
 module.exports = {

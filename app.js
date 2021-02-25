@@ -128,8 +128,23 @@ app.get("/game/:name", verifyToken, (req, res) =>
 app.post("/game", verifyToken, (req, res) =>
   privateRequest(req, res, 400, async () => {
     const { body } = req;
-    const game = await Game.create(body);
-    res.status(201).json(game);
+    const {
+      image,
+      image: { name, mimetype },
+    } = req.files;
+    const uploadPath = `${__dirname}/helpers/${name}`;
+    const error = {
+      error: "Wrong file type uploaded",
+      message: "You can only upload JPG, JPEG or PNG file!",
+    };
+    mimetype === "image/jpg" ||
+    mimetype === "image/jpeg" ||
+    mimetype === "image/png"
+      ? await image.mv(uploadPath, async () => {
+          const game = await Game.create(body, image);
+          res.status(201).json(game);
+        })
+      : res.status(400).json(error);
   })
 );
 
