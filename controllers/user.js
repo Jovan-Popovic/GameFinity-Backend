@@ -12,6 +12,8 @@ const {
   deleteImage,
 } = require("../helpers/controller");
 
+const defaultPic = "https://www.computerhope.com/jargon/g/guest-user.jpg";
+
 const findAll = (filter = {}) =>
   execController(skipNext, User.find(filter).lean());
 
@@ -19,12 +21,24 @@ const findOne = (filter, data) =>
   execController(skipNext, User.findOne(filter, data));
 
 const create = (user, file) =>
-  execController(async () => {
-    const profilePic = file
-      ? await uploadImage(file, "12_uStN3tcRRPbpwph3_qqfowUY5ndwxm")
-      : "https://www.computerhope.com/jargon/g/guest-user.jpg";
-    await User.create({ ...user, profilePic });
-  }, User.findOneAndUpdate(user, { $set: { password: SHA256(user.password) } }, { new: true, useFindAndModify: false }));
+  execController(
+    async () => {
+      const usersFolder = "12_uStN3tcRRPbpwph3_qqfowUY5ndwxm";
+      const profilePic = file
+        ? await uploadImage(file, usersFolder)
+        : defaultPic;
+      await User.create({ ...user, profilePic });
+    },
+    User.findOneAndUpdate(
+      user,
+      {
+        $set: {
+          password: SHA256(user.password),
+        },
+      },
+      { new: true, useFindAndModify: false }
+    )
+  );
 
 const findOneAndUpdate = (filter, file, update) =>
   execController(
@@ -52,8 +66,7 @@ const deleteOne = (filter) =>
     await Comment.deleteMany({ postedOn: "user", postedOnId: _id });
     await Transaction.deleteMany({ buyer: _id });
     await Transaction.deleteMany({ seller: _id });
-    if (profilePic !== "https://www.computerhope.com/jargon/g/guest-user.jpg")
-      await deleteImage(profilePic);
+    if (profilePic !== defaultPic) await deleteImage(profilePic);
   }, User.deleteOne(filter));
 
 module.exports = {

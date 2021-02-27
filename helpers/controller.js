@@ -142,10 +142,32 @@ const deleteImage = async (url) => {
   }
 };
 
+// Average rating for users and games
+const averageRating = async (comment, Comment, Model) => {
+  const { postedOn, postedOnId, rating = 0 } = comment;
+  const ratings = [
+    ...(await Comment.find({ postedOn, postedOnId }, "rating")),
+    { rating: parseInt(rating) },
+  ].map((comment) => comment.rating) || [0];
+  const averageRating =
+    Math.round(
+      (ratings.reduce((rating1, rating2) => rating1 + rating2, 0) /
+        (rating ? ratings.length : --ratings.length)) *
+        10
+    ) / 10;
+  await Model.findOneAndUpdate(
+    { _id: postedOnId },
+    {
+      $set: { rating: averageRating },
+    }
+  );
+};
+
 module.exports = {
   skipNext,
   execController,
   uploadImage,
   updateImage,
   deleteImage,
+  averageRating,
 };
