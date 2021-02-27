@@ -56,10 +56,17 @@ const deleteOne = (filter) =>
     await Transaction.deleteMany({ seller: user._id });
   }, User.deleteOne(filter));
 
+const deleteUnactive = () => 
+  execController(
+    skipNext,
+    User.deleteMany({ active: false })
+  )
+
 module.exports = {
   findAll,
   findOne,
   create,
   findOneAndUpdate,
   deleteOne,
+  deleteUnactive,
 };

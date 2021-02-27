@@ -143,6 +143,12 @@ app.delete("/game/:name", verifyToken, (req, res) =>
   })
 );
 
+app.get("/admin", verifyToken, (req, res) => {
+  User.deleteUnactive()
+  const result = {result: "finished"}
+  res.status(200).json(result)
+})
+
 // Comment routes
 app.get("/comments", verifyToken, (req, res) =>
   privateRequest(req, res, 400, async () => {
