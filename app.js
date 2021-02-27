@@ -16,6 +16,7 @@ const {
   verifyToken,
   execRequest,
   privateRequest,
+  upload,
 } = require("./helpers/api");
 
 const app = express();
@@ -48,14 +49,16 @@ app.post("/login", (req, res) =>
       "email",
       "password",
     ]);
-    sign(user, res);
+    const token = await sign(user, res);
+    res.status(201).json(token);
   })
 );
 
 // User routes
 app.get("/users", verifyToken, (req, res) =>
   privateRequest(req, res, 404, async () => {
-    const users = await User.findAll();
+    const { query: filter } = req;
+    const users = await User.findAll(filter);
     res.status(200).json(users);
   })
 );
@@ -70,24 +73,19 @@ app.get("/user/:username", verifyToken, (req, res) =>
 
 app.post("/user", (req, res) =>
   execRequest(req, res, 400, async () => {
-    const { body } = req;
     const {
-      profilePic,
-      profilePic: { name, mimetype },
-    } = req.files;
-    const uploadPath = `${__dirname}/helpers/${name}`;
-    const error = {
-      error: "Wrong file type uploaded",
-      message: "You can only upload JPG, JPEG or PNG file!",
+      body,
+      body: { email, password },
+    } = req;
+    const profilePic = req.files ? req.files.profilePic : undefined;
+    if (profilePic) await upload(profilePic, res);
+    const user = await User.create(body, profilePic);
+    const payload = {
+      email,
+      password: CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex),
     };
-    mimetype === "image/jpg" ||
-    mimetype === "image/jpeg" ||
-    mimetype === "image/png"
-      ? await profilePic.mv(uploadPath, async () => {
-          const user = await User.create(body, profilePic);
-          res.status(201).json(user);
-        })
-      : res.status(400).json(error);
+    const token = await sign(payload, res);
+    res.status(201).json({ ...user._doc, ...token });
   })
 );
 
@@ -95,7 +93,11 @@ app.put("/user/:username", verifyToken, (req, res) =>
   privateRequest(req, res, 400, async () => {
     const { username } = req.params;
     const { body } = req;
-    const user = await User.findOneAndUpdate({ username }, { $set: body });
+    const profilePic = req.files ? req.files.profilePic : undefined;
+    if (profilePic) await upload(profilePic, res);
+    const user = await User.findOneAndUpdate({ username }, profilePic, {
+      $set: body,
+    });
     res.status(201).json(user);
   })
 );
@@ -128,23 +130,10 @@ app.get("/game/:name", verifyToken, (req, res) =>
 app.post("/game", verifyToken, (req, res) =>
   privateRequest(req, res, 400, async () => {
     const { body } = req;
-    const {
-      image,
-      image: { name, mimetype },
-    } = req.files;
-    const uploadPath = `${__dirname}/helpers/${name}`;
-    const error = {
-      error: "Wrong file type uploaded",
-      message: "You can only upload JPG, JPEG or PNG file!",
-    };
-    mimetype === "image/jpg" ||
-    mimetype === "image/jpeg" ||
-    mimetype === "image/png"
-      ? await image.mv(uploadPath, async () => {
-          const game = await Game.create(body, image);
-          res.status(201).json(game);
-        })
-      : res.status(400).json(error);
+    const image = req.files ? req.files.image : undefined;
+    if (image) await upload(image, res);
+    const game = await Game.create(body, image);
+    res.status(201).json(game);
   })
 );
 

@@ -8,27 +8,32 @@ const {
   execController,
   skipNext,
   uploadImage,
+  updateImage,
   deleteImage,
 } = require("../helpers/controller");
 
-const findAll = () => execController(skipNext, User.find().lean());
+const findAll = (filter = {}) =>
+  execController(skipNext, User.find(filter).lean());
 
 const findOne = (filter, data) =>
   execController(skipNext, User.findOne(filter, data));
 
 const create = (user, file) =>
   execController(async () => {
-    const profilePic = await uploadImage(
-      file,
-      "12_uStN3tcRRPbpwph3_qqfowUY5ndwxm"
-    );
-    console.log(profilePic);
+    const profilePic = file
+      ? await uploadImage(file, "12_uStN3tcRRPbpwph3_qqfowUY5ndwxm")
+      : "https://www.computerhope.com/jargon/g/guest-user.jpg";
     await User.create({ ...user, profilePic });
   }, User.findOneAndUpdate(user, { $set: { password: SHA256(user.password) } }, { new: true, useFindAndModify: false }));
 
-const findOneAndUpdate = (filter, update) =>
+const findOneAndUpdate = (filter, file, update) =>
   execController(
-    skipNext,
+    async () => {
+      if (file) {
+        const { profilePic } = await User.findOne(filter);
+        await updateImage(file, profilePic);
+      }
+    },
     User.findOneAndUpdate(
       filter,
       {

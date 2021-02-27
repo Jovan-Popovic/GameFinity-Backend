@@ -11,13 +11,13 @@ const skipNext = () => {};
 
 // To reduce controllers
 const execController = (next, data) =>
-  new Promise(async (res, rej) => {
+  new Promise(async (resolve, reject) => {
     try {
       await next();
-      res(await data);
+      resolve(await data);
     } catch (err) {
       console.error(err);
-      rej(new Error(err));
+      reject(new Error(err));
     }
   });
 
@@ -47,7 +47,7 @@ const getAccessToken = async (oAuth2Client) => {
 
 // Authorize our Google API requests
 const authorize = () =>
-  new Promise((res, rej) => {
+  new Promise((resolve, reject) => {
     try {
       fs.readFile(CREDENTIALS_PATH, (err, credentials) =>
         err
@@ -64,12 +64,12 @@ const authorize = () =>
               auth.setCredentials(JSON.parse(token));
               err
                 ? await getAccessToken(auth)
-                : res(google.drive({ version: "v3", auth }));
+                : resolve(google.drive({ version: "v3", auth }));
             })
       );
     } catch (err) {
       console.error(err);
-      rej(new Error(err));
+      reject(new Error(err));
     }
   });
 
@@ -113,11 +113,28 @@ const uploadImage = async (image, folder) => {
   }
 };
 
+const updateImage = async (image, url) => {
+  try {
+    const { name, mimetype: mimeType } = image;
+    const path = `${__dirname}/${name}`;
+    const body = fs.createReadStream(path);
+    const drive = await authorize();
+    const media = { mimeType, body };
+    const fileId = url.split("=")[--url.split("=").length];
+    fs.unlink(path, (err) => {
+      if (err) throw err;
+    });
+    return await drive.files.update({ media, fileId });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 // Delete image from Google Drive
-const deleteImage = async (imageUrl) => {
+const deleteImage = async (url) => {
   try {
     const drive = await authorize();
-    const fileId = imageUrl.split("=")[--imageUrl.split("=").length];
+    const fileId = url.split("=")[--url.split("=").length];
     const response = await drive.files.delete({ fileId });
     return response;
   } catch (error) {
@@ -129,5 +146,6 @@ module.exports = {
   skipNext,
   execController,
   uploadImage,
+  updateImage,
   deleteImage,
 };

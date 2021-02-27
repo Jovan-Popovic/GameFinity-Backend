@@ -14,6 +14,8 @@ Down bellow you can see all the requests that frontend is be using.
 
 - `GET /users` - Get all the users, authentication required.
 
+- `GET /users?<query>` - Get all the users with queryes, this query represents any sort of filter (like firstName, lastName...), authentication required.
+
 - `GET /user/:username` - Get the user by username, authentication required.
 
 - `POST /user` - Create a new user, no authentication required.
@@ -28,7 +30,7 @@ Down bellow you can see all the requests that frontend is be using.
 
 - `GET /games` - Get all the games, no authentication required.
 
-- `GET /games?limit=0&offset=0` - Get all the games with queries, no authentication required.
+- `GET /games?limit=0&offset=0` - Get all the games with queries, limit presents maximum amount of returned games, offset presents amount of skipped games from the start of the request, no authentication required.
 
 - `GET /game/:name` - Get the game by name, authentication required.
 

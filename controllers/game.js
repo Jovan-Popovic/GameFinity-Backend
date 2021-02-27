@@ -20,7 +20,9 @@ const findOne = (filter, data) =>
 
 const create = (game, file) =>
   execController(async () => {
-    const image = await uploadImage(file, "1GWaB-McnGh3L1L3ICQkC0ek7o7GMEHg0");
+    const image = file
+      ? await uploadImage(file, "1GWaB-McnGh3L1L3ICQkC0ek7o7GMEHg0")
+      : "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/480px-No_image_available.svg.png";
     await Game.create({ ...game, image });
     await User.findOneAndUpdate(
       { _id: game.user },
@@ -55,7 +57,11 @@ const deleteOne = (filter) =>
     );
     await Comment.deleteMany({ postedOn: "game", postedOnId: _id });
     await Transaction.deleteMany({ game: _id });
-    await deleteImage(image);
+    if (
+      image !==
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/480px-No_image_available.svg.png"
+    )
+      await deleteImage(image);
   }, Game.deleteOne(filter));
 
 module.exports = {

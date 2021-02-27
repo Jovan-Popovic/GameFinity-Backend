@@ -18,7 +18,6 @@ const gameSchema = new mongoose.Schema(
       minlength: 3,
       maxlength: 50,
       required: true,
-      unique: true,
     },
     version: {
       type: String,
@@ -39,8 +38,8 @@ const gameSchema = new mongoose.Schema(
     ],
     image: {
       type: String,
-      required: true,
-      default: "",
+      default:
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/480px-No_image_available.svg.png",
     },
     state: {
       type: String,

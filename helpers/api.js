@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const { SECRET_KEY } = process.env;
+
 // Connect with the database
 const connect = (uri) =>
   mongoose.connect(uri, {
@@ -12,11 +13,18 @@ const connect = (uri) =>
 
 // Sign the JWT
 const sign = (user, res) =>
-  user
-    ? jwt.sign({ user }, SECRET_KEY, { expiresIn: "3h" }, (err, token) =>
-        !err ? res.status(201).json({ token }) : res.status(404).json(err)
-      )
-    : res.status(404).json({ error: "Wrong email or password" });
+  new Promise((resolve, reject) => {
+    try {
+      user
+        ? jwt.sign({ user }, SECRET_KEY, { expiresIn: "3h" }, (err, token) =>
+            resolve(!err ? { token } : res.status(404).json(err))
+          )
+        : res.status(404).json({ error: "Wrong email or password" });
+    } catch (err) {
+      console.error(err);
+      reject(new Error(err));
+    }
+  });
 
 // Verify token for every api request (except for creating the user)
 const verifyToken = (req, res, next) => {
@@ -28,7 +36,7 @@ const verifyToken = (req, res, next) => {
   } else res.sendStatus(403);
 };
 
-// To reduce public requests
+// Reduce public requests
 const execRequest = (req, res, status, action) => {
   try {
     action();
@@ -38,7 +46,7 @@ const execRequest = (req, res, status, action) => {
   }
 };
 
-// To reduce private requests
+// Reduce private requests
 const privateRequest = (req, res, status, action) => {
   try {
     jwt.verify(req.token, SECRET_KEY, async (err) => {
@@ -50,10 +58,33 @@ const privateRequest = (req, res, status, action) => {
   }
 };
 
+// Reduce image upload
+const upload = async (file, res) => {
+  try {
+    const { name, mimetype } = file;
+    const uploadPath = `${__dirname}/${name}`;
+    const error = {
+      error: "Wrong file type uploaded",
+      message: "You can only upload JPG, JPEG or PNG file!",
+    };
+    mimetype === "image/jpg" ||
+    mimetype === "image/jpeg" ||
+    mimetype === "image/png"
+      ? await file.mv(uploadPath, (err) => {
+          if (err) return res.status(400).json(err);
+        })
+      : res.status(400).json(error);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json(new Error(err));
+  }
+};
+
 module.exports = {
   connect,
   sign,
   verifyToken,
   execRequest,
   privateRequest,
+  upload,
 };
