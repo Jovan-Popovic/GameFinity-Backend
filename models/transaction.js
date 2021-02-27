@@ -20,6 +20,7 @@ const transactionSchema = new mongoose.Schema(
     confirmed: {
       type: Boolean,
       required: true,
+      default: false,
     },
     done: {
       type: Boolean,

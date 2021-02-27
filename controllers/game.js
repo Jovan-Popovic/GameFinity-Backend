@@ -6,11 +6,12 @@ const {
   execController,
   skipNext,
   uploadImage,
+  updateImage,
   deleteImage,
+  defaultImage,
 } = require("../helpers/controller");
 
-const defaultImage =
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/480px-No_image_available.svg.png";
+const gamesFolder = "1GWaB-McnGh3L1L3ICQkC0ek7o7GMEHg0";
 
 const findAll = (limit = 0, offset = 0) =>
   execController(
@@ -23,7 +24,6 @@ const findOne = (filter, data) =>
 
 const create = (game, file) =>
   execController(async () => {
-    const gamesFolder = "1GWaB-McnGh3L1L3ICQkC0ek7o7GMEHg0";
     const image = file ? await uploadImage(file, gamesFolder) : defaultImage;
     await Game.create({ ...game, image });
     await User.findOneAndUpdate(
@@ -37,9 +37,19 @@ const create = (game, file) =>
     ).populate("game");
   }, Game.findOne(game).populate("user"));
 
-const findOneAndUpdate = (filter, update) =>
+const findOneAndUpdate = (filter, file, update) =>
   execController(
-    skipNext,
+    async () => {
+      if (file) {
+        const { image } = await Game.findOne(filter);
+        const newImage = await updateImage(file, gamesFolder, image);
+        await Game.findOneAndUpdate(
+          filter,
+          { $set: { image: newImage } },
+          { new: true, useFindAndModify: false }
+        );
+      }
+    },
     Game.findOneAndUpdate(filter, update, {
       new: true,
       useFindAndModify: false,

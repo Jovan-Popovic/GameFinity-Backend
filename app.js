@@ -141,7 +141,9 @@ app.put("/game/:name", verifyToken, (req, res) =>
   privateRequest(req, res, 400, async () => {
     const { name } = req.params;
     const { body } = req;
-    const game = await Game.findOneAndUpdate({ name }, { $set: body });
+    const image = req.files ? req.files.image : undefined;
+    if (image) await upload(image, res);
+    const game = await Game.findOneAndUpdate({ name }, image, { $set: body });
     res.status(201).json(game);
   })
 );

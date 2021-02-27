@@ -5,6 +5,9 @@ const { google } = require("googleapis");
 const SCOPES = ["https://www.googleapis.com/auth/drive.file"];
 const CREDENTIALS_PATH = `${__dirname}/credentials.json`;
 const TOKEN_PATH = `${__dirname}/token.json`;
+const defaultPic = "https://www.computerhope.com/jargon/g/guest-user.jpg";
+const defaultImage =
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/480px-No_image_available.svg.png";
 
 // Skip next in execController
 const skipNext = () => {};
@@ -96,10 +99,10 @@ const uploadImage = async (image, folder) => {
     const { name, mimetype: mimeType } = image;
     const path = `${__dirname}/${name}`;
     const body = fs.createReadStream(path);
-    const drive = await authorize();
     const resource = { name, parents: [folder] };
     const media = { mimeType, body };
     const fields = "id";
+    const drive = await authorize();
     fs.unlink(path, (err) => {
       if (err) throw err;
     });
@@ -108,23 +111,6 @@ const uploadImage = async (image, folder) => {
     } = await drive.files.create({ resource, media, fields });
     const imageUrl = await generatePublicUrl(drive, id);
     return imageUrl;
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-const updateImage = async (image, url) => {
-  try {
-    const { name, mimetype: mimeType } = image;
-    const path = `${__dirname}/${name}`;
-    const body = fs.createReadStream(path);
-    const drive = await authorize();
-    const media = { mimeType, body };
-    const fileId = url.split("=")[--url.split("=").length];
-    fs.unlink(path, (err) => {
-      if (err) throw err;
-    });
-    return await drive.files.update({ media, fileId });
   } catch (err) {
     console.error(err);
   }
@@ -139,6 +125,15 @@ const deleteImage = async (url) => {
     return response;
   } catch (error) {
     console.error(error);
+  }
+};
+
+const updateImage = async (image, folder, url) => {
+  try {
+    if (url !== defaultPic || url !== defaultImage) await deleteImage(url);
+    return await uploadImage(image, folder);
+  } catch (err) {
+    console.error(err);
   }
 };
 
@@ -170,4 +165,6 @@ module.exports = {
   updateImage,
   deleteImage,
   averageRating,
+  defaultPic,
+  defaultImage,
 };

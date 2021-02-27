@@ -10,9 +10,10 @@ const {
   uploadImage,
   updateImage,
   deleteImage,
+  defaultPic,
 } = require("../helpers/controller");
 
-const defaultPic = "https://www.computerhope.com/jargon/g/guest-user.jpg";
+const usersFolder = "12_uStN3tcRRPbpwph3_qqfowUY5ndwxm";
 
 const findAll = (filter = {}) =>
   execController(skipNext, User.find(filter).lean());
@@ -23,7 +24,6 @@ const findOne = (filter, data) =>
 const create = (user, file) =>
   execController(
     async () => {
-      const usersFolder = "12_uStN3tcRRPbpwph3_qqfowUY5ndwxm";
       const profilePic = file
         ? await uploadImage(file, usersFolder)
         : defaultPic;
@@ -45,7 +45,12 @@ const findOneAndUpdate = (filter, file, update) =>
     async () => {
       if (file) {
         const { profilePic } = await User.findOne(filter);
-        await updateImage(file, profilePic);
+        const newProfilePic = await updateImage(file, usersFolder, profilePic);
+        await User.findOneAndUpdate(
+          filter,
+          { $set: { profilePic: newProfilePic } },
+          { new: true, useFindAndModify: false }
+        );
       }
     },
     User.findOneAndUpdate(
