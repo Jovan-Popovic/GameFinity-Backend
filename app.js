@@ -3,6 +3,7 @@ const fileUpload = require("express-fileupload");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const CryptoJS = require("crypto-js");
+const hbs = require('handlebars')
 require("dotenv").config();
 
 const User = require("./controllers/user");
@@ -19,6 +20,7 @@ const {
 
 const app = express();
 
+app.set("view engine", "hbs");
 app.use(fileUpload());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -92,6 +94,12 @@ app.delete("/user/:username", verifyToken, (req, res) =>
     res.status(200).json(user);
   })
 );
+
+app.get("/verify/:id", async(req, res) => {
+  let userId = req.params.id
+  await User.findOneAndUpdate({ _id : userId }, { active: true })
+  res.render("autoclose.hbs");
+})
 
 // Game routes
 app.get("/games", (req, res) =>

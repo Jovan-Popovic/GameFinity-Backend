@@ -75,6 +75,10 @@ const userSchema = new mongoose.Schema(
       maxlength: 7,
       default: "user",
     },
+    active: {
+      type: Boolean,
+      default: false,
+    },
   },
   { collection: "users", timestamps: true }
 );

@@ -4,6 +4,7 @@ const User = require("../models/user");
 const Game = require("../models/game");
 const Comment = require("../models/comment");
 const Transaction = require("../models/transaction");
+const Email = require("./email");
 const { execController, skipNext } = require("../helpers/controller");
 const {
   uploadImage,
@@ -16,16 +17,22 @@ const findAll = () => execController(skipNext, User.find().lean());
 const findOne = (filter, data) =>
   execController(skipNext, User.findOne(filter, data));
 
-const create = (user, image) =>
+const create = async (user, image) => {
   execController(
     async () => await User.create(user),
     User.findOneAndUpdate(
       user,
-      { $set: { password: SHA256(user.password) } },
+      //{ $set: { password: SHA256(user.password) } },
       { new: true, useFindAndModify: false }
     )
   );
 
+  const userN = user.username;
+  const createdUser = await User.findOne({ username: userN })
+  await Email.sendEmail(user.email, user.username, "", createdUser._id, "activate", "GameFinity - Activate Account");
+  return createdUser
+}
+  
 const findOneAndUpdate = (filter, update) =>
   execController(
     skipNext,
@@ -33,7 +40,7 @@ const findOneAndUpdate = (filter, update) =>
       filter,
       {
         ...update,
-        password: SHA256(update.password),
+        //password: SHA256(update.password),
       },
       { new: true, useFindAndModify: false }
     )

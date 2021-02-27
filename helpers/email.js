@@ -10,11 +10,11 @@ nodemailer.createTransport({
     }
 });
 
-const mailOptions = (userMail, htmlTem) => {
+const mailOptions = (userMail, htmlTem, name) => {
     let mailOptions = {
     from: process.env.EMAIL,
     to: userMail,
-    subject: 'GameFinity - Transaction',
+    subject: `GameFinity - ${name}`,
     html: htmlTem
     }
     return mailOptions;
