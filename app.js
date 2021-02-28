@@ -43,12 +43,12 @@ app.post("/login", (req, res) =>
   execRequest(req, res, 400, async () => {
     const { body } = req;
     const password = CryptoJS.SHA256(body.password).toString(CryptoJS.enc.Hex);
-    const user = await User.findOne({ ...body, password }, [
-      "username",
-      "password",
-    ]);
-    const token = await sign(user, res);
-    res.status(201).json(token);
+    const user = await User.findOne({ ...body, password });
+    const token = await sign(
+      { username: user.username, password: user.password },
+      res
+    );
+    res.status(201).json({ ...user._doc, ...token });
   })
 );
 
