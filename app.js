@@ -1,6 +1,5 @@
 const express = require("express");
 const fileUpload = require("express-fileupload");
-const compression = require("compression");
 const cors = require("cors");
 const { json } = require("body-parser");
 const CryptoJS = require("crypto-js");
@@ -11,7 +10,7 @@ const Game = require("./controllers/game");
 const Comment = require("./controllers/comment");
 const Transaction = require("./controllers/transaction");
 const {
-  connect,
+  start,
   sign,
   verifyToken,
   execRequest,
@@ -20,11 +19,10 @@ const {
 } = require("./helpers/api");
 
 const app = express();
+const { DB_URI } = process.env;
+const PORT = process.env.PORT || 5000;
 
-app.use(compression());
-app.use(fileUpload());
-app.use(json());
-app.use(cors());
+app.use(fileUpload()).use(json()).use(cors());
 
 // Root route
 app.get("/", (req, res) =>
@@ -46,7 +44,7 @@ app.post("/login", (req, res) =>
     const { body } = req;
     const password = CryptoJS.SHA256(body.password).toString(CryptoJS.enc.Hex);
     const user = await User.findOne({ ...body, password }, [
-      "email",
+      "username",
       "password",
     ]);
     const token = await sign(user, res);
@@ -75,13 +73,13 @@ app.post("/user", (req, res) =>
   execRequest(req, res, 400, async () => {
     const {
       body,
-      body: { email, password },
+      body: { username, password },
     } = req;
     const profilePic = req.files ? req.files.profilePic : undefined;
     if (profilePic) await upload(profilePic, res);
     const user = await User.create(body, profilePic);
     const payload = {
-      email,
+      username,
       password: CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex),
     };
     const token = await sign(payload, res);
@@ -241,13 +239,5 @@ app.delete("/transaction/:_id", verifyToken, (req, res) =>
   })
 );
 
-const PORT = process.env.PORT || 5000;
-
-// Connecting to the server
-connect(process.env.DB_URI)
-  .then(() =>
-    app.listen(PORT, () =>
-      console.log(`Server is running on the port ${PORT}.`)
-    )
-  )
-  .catch((err) => console.error("Unable to connect with the database:", err));
+// Start the app
+start(DB_URI, app, PORT);

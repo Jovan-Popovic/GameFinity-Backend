@@ -4,12 +4,19 @@ require("dotenv").config();
 
 const { SECRET_KEY } = process.env;
 
-// Connect with the database
-const connect = (uri) =>
-  mongoose.connect(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+// Connect with the database and start the server
+const start = (uri, app, port) =>
+  mongoose
+    .connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    })
+    .then(() =>
+      app.listen(port, () =>
+        console.log(`Server is running on the port ${port}.`)
+      )
+    )
+    .catch((err) => console.error("Unable to connect with the database:", err));
 
 // Sign the JWT
 const sign = (user, res) =>
@@ -19,7 +26,7 @@ const sign = (user, res) =>
         ? jwt.sign({ user }, SECRET_KEY, { expiresIn: "3h" }, (err, token) =>
             resolve(!err ? { token } : res.status(404).json(err))
           )
-        : res.status(404).json({ error: "Wrong email or password" });
+        : res.status(404).json({ error: "Wrong username or password" });
     } catch (err) {
       console.error(err);
       reject(new Error(err));
@@ -50,7 +57,7 @@ const execRequest = (req, res, status, action) => {
 const privateRequest = (req, res, status, action) => {
   try {
     jwt.verify(req.token, SECRET_KEY, async (err) => {
-      !err ? execRequest(req, res, status, action) : res.status(403).json(err);
+      !err ? execRequest(req, res, status, action) : res.status(401).json(err);
     });
   } catch (err) {
     console.log(err);
@@ -81,7 +88,7 @@ const upload = async (file, res) => {
 };
 
 module.exports = {
-  connect,
+  start,
   sign,
   verifyToken,
   execRequest,
