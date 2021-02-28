@@ -117,10 +117,10 @@ app.get("/games", (req, res) =>
   })
 );
 
-app.get("/game/:name", verifyToken, (req, res) =>
+app.get("/game/:_id", verifyToken, (req, res) =>
   privateRequest(req, res, 404, async () => {
-    const { name } = req.params;
-    const game = await Game.findOne({ name });
+    const { _id } = req.params;
+    const game = await Game.findOne({ _id });
     res.status(200).json(game);
   })
 );
@@ -135,21 +135,21 @@ app.post("/game", verifyToken, (req, res) =>
   })
 );
 
-app.put("/game/:name", verifyToken, (req, res) =>
+app.put("/game/:_id", verifyToken, (req, res) =>
   privateRequest(req, res, 400, async () => {
-    const { name } = req.params;
+    const { _id } = req.params;
     const { body } = req;
     const image = req.files ? req.files.image : undefined;
     if (image) await upload(image, res);
-    const game = await Game.findOneAndUpdate({ name }, image, { $set: body });
+    const game = await Game.findOneAndUpdate({ _id }, image, { $set: body });
     res.status(201).json(game);
   })
 );
 
-app.delete("/game/:name", verifyToken, (req, res) =>
+app.delete("/game/:_id", verifyToken, (req, res) =>
   privateRequest(req, res, 400, async () => {
-    const { name } = req.params;
-    const game = await Game.deleteOne({ name });
+    const { _id } = req.params;
+    const game = await Game.deleteOne({ _id });
     res.status(200).json(game);
   })
 );
