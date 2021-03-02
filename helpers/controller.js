@@ -9,15 +9,11 @@ const defaultPic = "https://www.computerhope.com/jargon/g/guest-user.jpg";
 const defaultImage =
   "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/480px-No_image_available.svg.png";
 
-// Skip next in execController
-const skipNext = () => {};
-
 // To reduce controllers
-const execController = (next, data) =>
+const execPromise = (action) =>
   new Promise(async (resolve, reject) => {
     try {
-      await next();
-      resolve(await data);
+      resolve(await action());
     } catch (err) {
       console.error(err);
       reject(new Error(err));
@@ -77,8 +73,8 @@ const authorize = () =>
   });
 
 // Generate public URL for uploaded images
-const generatePublicUrl = async (drive, id) => {
-  try {
+const generatePublicUrl = async (drive, id) =>
+  execPromise(async () => {
     const resource = {
       role: "reader",
       type: "anyone",
@@ -88,14 +84,11 @@ const generatePublicUrl = async (drive, id) => {
     const imageUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
     await drive.permissions.create({ resource, fileId, fields });
     return imageUrl;
-  } catch (error) {
-    console.error(error);
-  }
-};
+  });
 
 // Upload image to Google Drive
-const uploadImage = async (image, folder) => {
-  try {
+const uploadImage = async (image, folder) =>
+  execPromise(async () => {
     const { name, mimetype: mimeType } = image;
     const path = `${__dirname}/${name}`;
     const body = fs.createReadStream(path);
@@ -111,37 +104,28 @@ const uploadImage = async (image, folder) => {
     } = await drive.files.create({ resource, media, fields });
     const imageUrl = await generatePublicUrl(drive, id);
     return imageUrl;
-  } catch (err) {
-    console.error(err);
-  }
-};
+  });
 
 // Delete image from Google Drive
-const deleteImage = async (url) => {
-  try {
+const deleteImage = async (url) =>
+  execPromise(async () => {
     const drive = await authorize();
     const fileId = url.split("=")[--url.split("=").length];
     const response = await drive.files.delete({ fileId });
     return response;
-  } catch (error) {
-    console.error(error);
-  }
-};
+  });
 
-const updateImage = async (image, folder, url) => {
-  try {
+const updateImage = async (image, folder, url) =>
+  execPromise(async () => {
     if (url !== defaultPic || url !== defaultImage) await deleteImage(url);
     return await uploadImage(image, folder);
-  } catch (err) {
-    console.error(err);
-  }
-};
+  });
 
 // Average rating for users and games
 const averageRating = async (comment, Comment, Model) => {
   const { postedOn, postedOnId, rating = 0 } = comment;
   const ratings = [
-    ...(await Comment.find({ postedOn, postedOnId }, "rating")),
+    ...((await Comment.find({ postedOn, postedOnId }, "rating")) || 0),
     { rating: parseInt(rating) },
   ].map((comment) => comment.rating) || [0];
   const averageRating =
@@ -150,7 +134,7 @@ const averageRating = async (comment, Comment, Model) => {
         (rating ? ratings.length : --ratings.length)) *
         10
     ) / 10;
-  await Model.findOneAndUpdate(
+  return await Model.findOneAndUpdate(
     { _id: postedOnId },
     {
       $set: { rating: averageRating },
@@ -159,8 +143,7 @@ const averageRating = async (comment, Comment, Model) => {
 };
 
 module.exports = {
-  skipNext,
-  execController,
+  execPromise,
   uploadImage,
   updateImage,
   deleteImage,

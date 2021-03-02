@@ -1,28 +1,34 @@
 const User = require("../models/user");
 const Game = require("../models/game");
-const { deleteOne: deleteGame } = require("./game");
 const Transaction = require("../models/transaction");
-const { execController, skipNext } = require("../helpers/controller");
+const { execPromise } = require("../helpers/controller");
 
-const findAll = () => execController(skipNext, Transaction.find().lean());
+const findAll = () => execPromise(async () => await Transaction.find().lean());
 
 const findOne = (filter, data) =>
-  execController(skipNext, Transaction.findOne(filter, data));
+  execPromise(async () => await Transaction.findOne(filter, data));
 
 const create = (transaction) =>
-  execController(
-    async () => await Transaction.create(transaction),
-    Transaction.findOne(transaction).populate("game").populate("user")
-  );
+  execPromise(async () => {
+    await Transaction.create(transaction);
+    return await Transaction.findOne(transaction)
+      .populate("game")
+      .populate("user");
+  });
 
 const findOneAndUpdate = (filter, update) =>
-  execController(async () => {
-    const { done } = update.$set;
-    const transaction = await Transaction.findOneAndUpdate(filter, update, {
-      new: true,
-      useFindAndModify: false,
-    });
-    if (done) {
+  execPromise(async () => {
+    const { confirmed, done } = update;
+    const transaction = await Transaction.findOneAndUpdate(
+      filter,
+      { $set: { ...update } },
+      {
+        new: true,
+        useFindAndModify: false,
+      }
+    );
+    const game = await Game.findOne({ _id: transaction.game });
+    if (confirmed && done && game.transaction !== 0) {
       const game = await Game.findOneAndUpdate(
         { _id: transaction.game },
         { $inc: { quantity: -1 } },
@@ -47,12 +53,14 @@ const findOneAndUpdate = (filter, update) =>
           useFindAndModify: false,
         }
       );
-      if (game.quantity === 0) deleteGame({ _id: transaction.game });
+      return await Transaction.findOne(filter);
+    } else {
+      console.error("There is no more games to sell");
     }
-  }, Transaction.findOne(filter));
+  });
 
 const deleteOne = (filter) =>
-  execController(skipNext, Transaction.deleteOne(filter));
+  execPromise(async () => await Transaction.deleteOne(filter));
 
 module.exports = {
   findAll,

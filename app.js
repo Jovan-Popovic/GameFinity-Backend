@@ -93,9 +93,7 @@ app.put("/user/:username", verifyToken, (req, res) =>
     const { body } = req;
     const profilePic = req.files ? req.files.profilePic : undefined;
     if (profilePic) await upload(profilePic, res);
-    const user = await User.findOneAndUpdate({ username }, profilePic, {
-      $set: body,
-    });
+    const user = await User.findOneAndUpdate({ username }, profilePic, body);
     res.status(201).json(user);
   })
 );
@@ -141,7 +139,7 @@ app.put("/game/:_id", verifyToken, (req, res) =>
     const { body } = req;
     const image = req.files ? req.files.image : undefined;
     if (image) await upload(image, res);
-    const game = await Game.findOneAndUpdate({ _id }, image, { $set: body });
+    const game = await Game.findOneAndUpdate({ _id }, image, body);
     res.status(201).json(game);
   })
 );
@@ -182,7 +180,7 @@ app.put("/comment/:_id", verifyToken, (req, res) =>
   privateRequest(req, res, 400, async () => {
     const { _id } = req.params;
     const { body } = req;
-    const comment = await Comment.findOneAndUpdate({ _id }, { $set: body });
+    const comment = await Comment.findOneAndUpdate({ _id }, body);
     res.status(201).json(comment);
   })
 );
@@ -223,10 +221,7 @@ app.put("/transaction/:_id", verifyToken, (req, res) =>
   privateRequest(req, res, 400, async () => {
     const { _id } = req.params;
     const { body } = req;
-    const transaction = await Transaction.findOneAndUpdate(
-      { _id },
-      { $set: body }
-    );
+    const transaction = await Transaction.findOneAndUpdate({ _id }, body);
     res.status(201).json(transaction);
   })
 );

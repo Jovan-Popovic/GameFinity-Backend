@@ -10,6 +10,7 @@ const start = (uri, app, port) =>
     .connect(uri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      useCreateIndex: true,
     })
     .then(() =>
       app.listen(port, () =>
