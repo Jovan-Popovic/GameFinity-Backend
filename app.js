@@ -1,7 +1,7 @@
 const express = require("express");
 const fileUpload = require("express-fileupload");
 const cors = require("cors");
-const { json } = require("body-parser");
+const { json, urlencoded } = require("body-parser");
 const CryptoJS = require("crypto-js");
 require("dotenv").config();
 
@@ -21,8 +21,13 @@ const {
 const app = express();
 const { DB_URI } = process.env;
 const PORT = process.env.PORT || 5000;
+const fileSize = 3145728;
 
-app.use(fileUpload()).use(json()).use(cors());
+app
+  .use(fileUpload())
+  .use(urlencoded({ extended: true }))
+  .use(json())
+  .use(cors());
 
 // Root route
 app.get("/", (req, res) =>
@@ -48,7 +53,7 @@ app.post("/login", (req, res) =>
       { username: user.username, password: user.password },
       res
     );
-    res.status(201).json({ ...user._doc, ...token });
+    return res.status(201).json({ ...user._doc, ...token });
   })
 );
 
@@ -75,7 +80,10 @@ app.post("/user", (req, res) =>
       body,
       body: { username, password },
     } = req;
-    const profilePic = req.files ? req.files.profilePic : undefined;
+    const profilePic =
+      req.files && req.files.profilePic.size <= fileSize
+        ? req.files.profilePic
+        : undefined;
     if (profilePic) await upload(profilePic, res);
     const user = await User.create(body, profilePic);
     const payload = {
@@ -83,7 +91,9 @@ app.post("/user", (req, res) =>
       password: CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex),
     };
     const token = await sign(payload, res);
-    res.status(201).json({ ...user._doc, ...token });
+    res
+      .status(201)
+      .json({ ...user._doc, ...token } || new Error("wrong data sent"));
   })
 );
 
@@ -91,7 +101,10 @@ app.put("/user/:username", verifyToken, (req, res) =>
   privateRequest(req, res, 400, async () => {
     const { username } = req.params;
     const { body } = req;
-    const profilePic = req.files ? req.files.profilePic : undefined;
+    const profilePic =
+      req.files && req.files.profilePic.size <= fileSize
+        ? req.files.profilePic
+        : undefined;
     if (profilePic) await upload(profilePic, res);
     const user = await User.findOneAndUpdate({ username }, profilePic, body);
     res.status(201).json(user);
@@ -126,7 +139,10 @@ app.get("/game/:_id", verifyToken, (req, res) =>
 app.post("/game", verifyToken, (req, res) =>
   privateRequest(req, res, 400, async () => {
     const { body } = req;
-    const image = req.files ? req.files.image : undefined;
+    const image =
+      req.files && req.files.image.size <= fileSize
+        ? req.files.image
+        : undefined;
     if (image) await upload(image, res);
     const game = await Game.create(body, image);
     res.status(201).json(game);
@@ -137,7 +153,10 @@ app.put("/game/:_id", verifyToken, (req, res) =>
   privateRequest(req, res, 400, async () => {
     const { _id } = req.params;
     const { body } = req;
-    const image = req.files ? req.files.image : undefined;
+    const image =
+      req.files && req.files.image.size <= fileSize
+        ? req.files.image
+        : undefined;
     if (image) await upload(image, res);
     const game = await Game.findOneAndUpdate({ _id }, image, body);
     res.status(201).json(game);

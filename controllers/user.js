@@ -18,7 +18,7 @@ const findAll = (filter = {}) =>
   execPromise(async () => await User.find(filter).lean());
 
 const findOne = (filter, data) =>
-  execPromise(async () => await User.findOne(filter, data));
+  execPromise(async () => await User.findOne(filter, data).orFail());
 
 const create = (user, file) =>
   execPromise(async () => {

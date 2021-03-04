@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const { connect } = require("mongoose");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
@@ -6,12 +6,11 @@ const { SECRET_KEY } = process.env;
 
 // Connect with the database and start the server
 const start = (uri, app, port) =>
-  mongoose
-    .connect(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useCreateIndex: true,
-    })
+  connect(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+  })
     .then(() =>
       app.listen(port, () =>
         console.log(`Server is running on the port ${port}.`)
